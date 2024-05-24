@@ -1,86 +1,89 @@
-// src/components/Game.js
-import React, { useState } from 'react';
-import { Box, Button, Input, VStack, Text, SimpleGrid, useColorMode, useColorModeValue } from '@chakra-ui/react';
-import Board from './Board';
-
-const Game = () => {
-  const [size, setSize] = useState('');
-  const [winStreak, setWinStreak] = useState('');
-  const [gamesToPlay, setGamesToPlay] = useState('');
-  const [board, setBoard] = useState([]);
-  const [currentPlayer, setCurrentPlayer] = useState('X');
-  const [winner, setWinner] = useState(null);
-  const [xWins, setXWins] = useState(0);
-  const [oWins, setOWins] = useState(0);
-  const [gamesPlayed, setGamesPlayed] = useState(0);
-  const [isGameSetup, setIsGameSetup] = useState(true);
-  const { colorMode, toggleColorMode } = useColorMode();
-
-  const initializeBoard = (n) => {
-    setBoard(Array(n).fill(null).map(() => Array(n).fill(null)));
-  };
-
-  const checkLine = (line) => {
-    let count = 0;
-    let lastPlayer = null;
-    for (let cell of line) {
-      if (cell === lastPlayer && cell !== null) {
-        count++;
-        if (count === parseInt(winStreak)) return true;
-      } else {
-        lastPlayer = cell;
-        count = 1;
-      }
-    }
-    return false;
-  };
-
-  const checkWinner = (board, size, winStreak) => {
-    // Check rows and columns
-    for (let i = 0; i < size; i++) {
-      if (checkLine(board[i]) || checkLine(board.map(row => row[i]))) {
-        return true;
-      }
-    }
-
-    // Check diagonals
-    for (let r = 0; r <= size - winStreak; r++) {
-      for (let c = 0; c <= size - winStreak; c++) {
-        const mainDiagonal = Array(winStreak).fill().map((_, k) => board[r + k][c + k]);
-        const antiDiagonal = Array(winStreak).fill().map((_, k) => board[r + k][c + winStreak - k - 1]);
-        if (checkLine(mainDiagonal) || checkLine(antiDiagonal)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  };
-
-  const handleCellClick = (row, col) => {
-    if (board[row][col] || winner) return;
-
-    const newBoard = board.map((r, rowIndex) =>
-      r.map((cell, colIndex) => (rowIndex === row && colIndex === col ? currentPlayer : cell))
-    );
-
-    setBoard(newBoard);
-    if (checkWinner(newBoard, parseInt(size), parseInt(winStreak))) {
-      setWinner(currentPlayer);
-      if (currentPlayer === 'X') {
-        setXWins(xWins + 1);
-      } else {
-        setOWins(oWins + 1);
-      }
-      setGamesPlayed(gamesPlayed + 1);
-    } else if (newBoard.flat().every(cell => cell)) {
-      setGamesPlayed(gamesPlayed + 1);
+  import React, { useState } from 'react'; // Import React and useState hook
+      import { Box, Button, Input, VStack, Text, useColorModeValue } from '@chakra-ui/react'; // Import Chakra UI components
+      import Board from './Board'; // Import the Board component
+      
+      // Define the Game component
+      const Game = () => {
+        // State variables to manage game settings and state
+        const [size, setSize] = useState(''); // State for grid size
+        const [winStreak, setWinStreak] = useState(''); // State for win streak
+        const [gamesToPlay, setGamesToPlay] = useState(''); // State for number of games to play
+        const [board, setBoard] = useState([]); // State for game board
+        const [currentPlayer, setCurrentPlayer] = useState('X'); // State for current player
+        const [winner, setWinner] = useState(null); // State for winner of the game
+        const [xWins, setXWins] = useState(0); // State for number of wins for player X
+        const [oWins, setOWins] = useState(0); // State for number of wins for player O
+        const [gamesPlayed, setGamesPlayed] = useState(0); // State for number of games played
+        const [isGameSetup, setIsGameSetup] = useState(true); // State to track if the game setup is in progress
+      
+        // Function to initialize the game board
+        const initializeBoard = (n) => {
+          setBoard(Array(n).fill(null).map(() => Array(n).fill(null))); // Create a 2D array for the game board
+        };
+      
+        // Function to check for a winning line
+        const checkLine = (line) => {
+          let count = 0; // Initialize count to 0
+          let lastPlayer = null; // Initialize lastPlayer to null
+          for (let cell of line) { // Loop through each cell in the line
+            if (cell === lastPlayer && cell !== null) { // If the cell matches the last player and is not null
+              count++; // Increment the count
+              if (count === parseInt(winStreak)) return true; // If the count equals win streak, return true
+            } else {
+              lastPlayer = cell; // Update lastPlayer to the current cell
+              count = 1; // Reset count to 1
+            }
+          }
+          return false; // Return false if no winning line is found
+        };
+      
+        // Function to check for a winner on the board
+        const checkWinner = (board, size, winStreak) => {
+          // Check rows and columns
+          for (let i = 0; i < size; i++) {
+            if (checkLine(board[i]) || checkLine(board.map(row => row[i]))) { // Check each row and column for winning lines
+              return true; // If a winning line is found, return true
+            }
+          }
+      
+          // Check diagonals
+          for (let r = 0; r <= size - winStreak; r++) {
+            for (let c = 0; c <= size - winStreak; c++) {
+              const mainDiagonal = Array(winStreak).fill().map((_, k) => board[r + k][c + k]); // Get main diagonal cells
+              const antiDiagonal = Array(winStreak).fill().map((_, k) => board[r + k][c + winStreak - k - 1]); // Get anti diagonal cells
+              if (checkLine(mainDiagonal) || checkLine(antiDiagonal)) { // Check diagonals for winning lines
+                return true; // If a winning line is found, return true
+              }
+            }
+          }
+      
+          return false; // Return false if no winner is found
+        };
+      
+        // Function to handle cell click events
+        const handleCellClick = (row, col) => {
+          if (board[row][col] || winner) return; // If cell is already filled or there is a winner, return
+      
+          const newBoard = board.map((r, rowIndex) => // Create a new board with updated cell
+            r.map((cell, colIndex) => (rowIndex === row && colIndex === col ? currentPlayer : cell))
+          );
+      
+          setBoard(newBoard); // Update the game board
+          if (checkWinner(newBoard, parseInt(size), parseInt(winStreak))) { // If there is a winner
+            setWinner(currentPlayer); // Set the winner
+            if (currentPlayer === 'X') { // If current player is X
+              setXWins(xWins + 1); // Increment X wins
+            } else {
+              setOWins(oWins + 1); // Increment O wins
+            }
+            setGamesPlayed(gamesPlayed + 1); // Increment games
       setWinner('Draw');
     } else {
       setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
     }
   };
 
+  // Functions to handle input changes
   const handleSizeChange = (e) => {
     setSize(e.target.value);
   };
@@ -93,6 +96,7 @@ const Game = () => {
     setGamesToPlay(e.target.value);
   };
 
+  // Function to start a new game
   const startNewGame = () => {
     if (gamesPlayed < parseInt(gamesToPlay)) {
       initializeBoard(parseInt(size));
@@ -103,6 +107,7 @@ const Game = () => {
     }
   };
 
+  // Function to handle start game button click
   const handleStartGame = () => {
     if (size >= 3 && size <= 10 && winStreak >= 3 && winStreak <= size && gamesToPlay > 0) {
       setXWins(0);
@@ -115,8 +120,8 @@ const Game = () => {
     }
   };
 
+  // Variables for styling
   const bgColor = useColorModeValue('gray.100', 'gray.700');
-  const buttonColor = useColorModeValue('blue.500', 'blue.200');
 
   return (
     <VStack spacing={4} p={4} bg={bgColor} borderRadius="md" boxShadow="lg">
@@ -161,12 +166,17 @@ const Game = () => {
         </>
       ) : (
         <>
+          {/* Render the game board */}
           <Board size={parseInt(size)} board={board} onCellClick={handleCellClick} />
+
+          {/* Display the winner or draw message */}
           {winner && (
             <Text fontSize="2xl" color="green.500" fontWeight="bold" mt={4}>
               {winner === 'Draw' ? 'It\'s a Draw!' : `Player ${winner} wins!`}
             </Text>
           )}
+
+          {/* Display the number of wins for each player and games played */}
           <Text fontSize="lg" color="gray.600">
             X Wins: {xWins}
           </Text>
