@@ -1,31 +1,7 @@
 // src/components/Game.js
 import React, { useState } from 'react';
-import { Box, Button, Input, VStack, Text, SimpleGrid } from '@chakra-ui/react';
-
-const Board = ({ size, board, onCellClick }) => {
-  return (
-    <SimpleGrid columns={size} spacing={1}>
-      {board.map((row, rowIndex) =>
-        row.map((cell, colIndex) => (
-          <Box
-            key={`${rowIndex}-${colIndex}`}
-            onClick={() => onCellClick(rowIndex, colIndex)}
-            borderWidth="1px"
-            borderRadius="md"
-            boxSize="50px"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            fontSize="2xl"
-            cursor="pointer"
-          >
-            {cell}
-          </Box>
-        ))
-      )}
-    </SimpleGrid>
-  );
-};
+import { Box, Button, Input, VStack, Text, SimpleGrid, useColorMode, useColorModeValue } from '@chakra-ui/react';
+import Board from './Board';
 
 const Game = () => {
   const [size, setSize] = useState('');
@@ -38,6 +14,7 @@ const Game = () => {
   const [oWins, setOWins] = useState(0);
   const [gamesPlayed, setGamesPlayed] = useState(0);
   const [isGameSetup, setIsGameSetup] = useState(true);
+  const { colorMode, toggleColorMode } = useColorMode();
 
   const initializeBoard = (n) => {
     setBoard(Array(n).fill(null).map(() => Array(n).fill(null)));
@@ -138,38 +115,72 @@ const Game = () => {
     }
   };
 
+  const bgColor = useColorModeValue('gray.100', 'gray.700');
+  const buttonColor = useColorModeValue('blue.500', 'blue.200');
+
   return (
-    <VStack spacing={4}>
+    <VStack spacing={4} p={4} bg={bgColor} borderRadius="md" boxShadow="lg">
       {isGameSetup ? (
         <>
           <Box>
-            <Text>Grid Size (3-10):</Text>
-            <Input type="number" value={size} onChange={handleSizeChange} />
+            <Text mb={2} fontWeight="bold">Grid Size (3-10):</Text>
+            <Input
+              type="number"
+              value={size}
+              onChange={handleSizeChange}
+              placeholder="Enter grid size"
+              mb={4}
+              size="lg"
+            />
           </Box>
           <Box>
-            <Text>Win Streak (3-{size}):</Text>
-            <Input type="number" value={winStreak} onChange={handleWinStreakChange} />
+            <Text mb={2} fontWeight="bold">Win Streak (3-{size}):</Text>
+            <Input
+              type="number"
+              value={winStreak}
+              onChange={handleWinStreakChange}
+              placeholder="Enter win streak"
+              mb={4}
+              size="lg"
+            />
           </Box>
           <Box>
-            <Text>Number of Games to Play:</Text>
-            <Input type="number" value={gamesToPlay} onChange={handleGamesToPlayChange} />
+            <Text mb={2} fontWeight="bold">Number of Games to Play:</Text>
+            <Input
+              type="number"
+              value={gamesToPlay}
+              onChange={handleGamesToPlayChange}
+              placeholder="Enter number of games"
+              mb={4}
+              size="lg"
+            />
           </Box>
-          <Button onClick={handleStartGame}>Start Game</Button>
+          <Button colorScheme="blue" size="lg" onClick={handleStartGame}>
+            Start Game
+          </Button>
         </>
       ) : (
         <>
           <Board size={parseInt(size)} board={board} onCellClick={handleCellClick} />
           {winner && (
-            <Text fontSize="2xl" color="green.500">
+            <Text fontSize="2xl" color="green.500" fontWeight="bold" mt={4}>
               {winner === 'Draw' ? 'It\'s a Draw!' : `Player ${winner} wins!`}
             </Text>
           )}
-          <Text>X Wins: {xWins}</Text>
-          <Text>O Wins: {oWins}</Text>
-          <Text>Games Played: {gamesPlayed}/{gamesToPlay}</Text>
-          <Button onClick={startNewGame}>Next Game</Button>
+          <Text fontSize="lg" color="gray.600">
+            X Wins: {xWins}
+          </Text>
+          <Text fontSize="lg" color="gray.600">
+            O Wins: {oWins}
+          </Text>
+          <Text fontSize="lg" color="gray.600" mb={4}>
+            Games Played: {gamesPlayed}/{gamesToPlay}
+          </Text>
+          <Button colorScheme="green" size="lg" onClick={startNewGame}>
+            Next Game
+          </Button>
           {gamesPlayed === parseInt(gamesToPlay) && (
-            <Text fontSize="2xl" color="blue.500">
+            <Text fontSize="2xl" color="blue.500" fontWeight="bold" mt={4}>
               {xWins > oWins ? 'Player X wins the series!' : xWins < oWins ? 'Player O wins the series!' : 'The series is a draw!'}
             </Text>
           )}

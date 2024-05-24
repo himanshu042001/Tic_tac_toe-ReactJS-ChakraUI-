@@ -1,31 +1,27 @@
 // src/App.js
 import React from 'react';
 import Game from './components/Game';
-import { Container, Heading, ChakraProvider, CSSReset, theme } from '@chakra-ui/react';
-
-const customTheme = {
-  ...theme,
-  colors: {
-    ...theme.colors,
-    brand: {
-      900: "#1a202c", // Darker shade of gray for background
-      800: "#2d3748", // Dark shade of gray for card
-      700: "#4a5568", // Dark shade of gray for text
-    },
-  },
-};
+import { Container, Heading, Flex, IconButton, useColorMode, useColorModeValue } from '@chakra-ui/react';
+import { FaSun, FaMoon } from 'react-icons/fa';
 
 function App() {
+  const { colorMode, toggleColorMode } = useColorMode();
+
   return (
-    <ChakraProvider theme={customTheme}>
-      <CSSReset />
-      <Container centerContent>
-        <Heading as="h1" my={4}>
+    <Container centerContent>
+      <Flex justify="space-between" align="center" w="100%" mb={4} p={4} bg={useColorModeValue('gray.100', 'gray.700')} borderRadius="lg" boxShadow="xl">
+        <Heading as="h1" textAlign="center" flexGrow={1}>
           Tic-Tac-Toe
         </Heading>
-        <Game />
-      </Container>
-    </ChakraProvider>
+        <IconButton
+          icon={colorMode === 'light' ? <FaMoon /> : <FaSun />}
+          onClick={toggleColorMode}
+          variant="ghost"
+          aria-label="Toggle dark mode"
+        />
+      </Flex>
+      <Game />
+    </Container>
   );
 }
 
